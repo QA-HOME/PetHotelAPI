@@ -9,6 +9,7 @@ import (
 func Index(w http.ResponseWriter, r *http.Request) {
 
 	m := make(map[string]string)
+	m["status"] = "success"
 	m["message"] = "home page"
 	m["title"] = "home page"
 
