@@ -11,7 +11,7 @@ func main() {
 	r := http.NewServeMux()
 	r.HandleFunc("/", handlers.Index)
 
-	log.Default().Print("localhost:8081 is started")
+	log.Default().Print("Server localhost:8081 is started")
 
 	defer func(addr string, handler http.Handler) {
 		err := http.ListenAndServe(addr, handler)
