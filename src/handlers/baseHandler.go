@@ -18,42 +18,34 @@ func ValidateToken(next func(w http.ResponseWriter, r *http.Request)) http.Handl
 			token, err := jwt.Parse(r.Header["Token"][0], func(t *jwt.Token) (interface{}, error) {
 				_, ok := t.Method.(*jwt.SigningMethodHMAC)
 				if !ok {
-					w.WriteHeader(http.StatusUnauthorized)
-					m := make(map[string]string)
-					m["status"] = "unauthorized"
-					m["message"] = "you are unauthorized"
-					jsonM, _ := json.Marshal(m)
-
-					_, err := w.Write(jsonM)
-					errors.CheckErr(err)
+					SendUnAuthWrite(w)
 				}
 				return SECRET, nil
 			})
 
 			if err != nil {
-
-				w.WriteHeader(http.StatusUnauthorized)
-				m := make(map[string]string)
-				m["status"] = "unauthorized"
-				m["message"] = "you are unauthorized"
-				jsonM, _ := json.Marshal(m)
-
-				_, err := w.Write(jsonM)
-				errors.CheckErr(err)
+				SendUnAuthWrite(w)
 			}
 
 			if token.Valid {
 				next(w, r)
 			}
 		} else {
-			w.WriteHeader(http.StatusUnauthorized)
-			m := make(map[string]string)
-			m["status"] = "unauthorized"
-			m["message"] = "you are unauthorized"
-			jsonM, _ := json.Marshal(m)
-
-			_, err := w.Write(jsonM)
-			errors.CheckErr(err)
+			SendUnAuthWrite(w)
 		}
 	})
+}
+
+func SendUnAuthWrite(w http.ResponseWriter) {
+
+	SetContentJson(w)
+
+	w.WriteHeader(http.StatusUnauthorized)
+	m := make(map[string]string)
+	m["status"] = "unauthorized"
+	m["message"] = "you are unauthorized"
+	jsonM, _ := json.Marshal(m)
+
+	_, err := w.Write(jsonM)
+	errors.CheckErr(err)
 }

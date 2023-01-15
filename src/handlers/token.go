@@ -1,9 +1,8 @@
 package handlers
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/golang-jwt/jwt/v4"
-	"log"
 	"net/http"
 	"time"
 	"v1/src/auth"
@@ -14,6 +13,8 @@ var SECRET = []byte("super-secret-auth-key")
 
 func GetToken(w http.ResponseWriter, r *http.Request) {
 
+	SetContentJson(w)
+
 	if r.Header["X-Api-Key"] != nil {
 
 		if auth.CheckPasswordHash(r.Header["X-Api-Key"][0]) {
@@ -21,14 +22,20 @@ func GetToken(w http.ResponseWriter, r *http.Request) {
 			token, err := CreateToken()
 			errors.CheckErr(err)
 
-			_, err = fmt.Fprint(w, token)
+			m := make(map[string]string)
+			m["token"] = token
+			m["status"] = "success"
+
+			jsonS, _ := json.Marshal(m)
+
+			_, err = w.Write(jsonS)
 			errors.CheckErr(err)
+
 		} else {
-			return
+			SendUnAuthWrite(w)
 		}
 	} else {
-		log.Default().Print("x-api-key is empty")
-		log.Default().Print(r.Header)
+		SendUnAuthWrite(w)
 	}
 }
 
