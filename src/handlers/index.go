@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"v1/src/errors"
 )
@@ -9,6 +10,8 @@ import (
 func Index(w http.ResponseWriter, r *http.Request) {
 
 	SetContentJson(w)
+
+	log.Default().Print("success")
 
 	m := make(map[string]string)
 	m["status"] = "success"

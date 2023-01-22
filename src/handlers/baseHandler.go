@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/golang-jwt/jwt/v4"
+	"log"
 	"net/http"
 	"v1/src/errors"
 )
@@ -39,6 +40,8 @@ func ValidateToken(next func(w http.ResponseWriter, r *http.Request)) http.Handl
 func SendUnAuthWrite(w http.ResponseWriter) {
 
 	SetContentJson(w)
+
+	log.Default().Print("unauthorized")
 
 	w.WriteHeader(http.StatusUnauthorized)
 	m := make(map[string]string)

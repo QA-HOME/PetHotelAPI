@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/golang-jwt/jwt/v4"
+	"log"
 	"net/http"
 	"time"
 	"v1/src/auth"
@@ -21,6 +22,8 @@ func GetToken(w http.ResponseWriter, r *http.Request) {
 
 			token, err := CreateToken()
 			errors.CheckErr(err)
+
+			log.Default().Print("success token")
 
 			m := make(map[string]string)
 			m["token"] = token
