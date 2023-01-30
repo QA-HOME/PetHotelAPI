@@ -5,6 +5,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"log"
 	"net/http"
+	"strings"
 	"v1/src/errors"
 )
 
@@ -15,8 +16,12 @@ func SetContentJson(w http.ResponseWriter) {
 func ValidateToken(next func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		if r.Header["Token"] != nil {
-			token, err := jwt.Parse(r.Header["Token"][0], func(t *jwt.Token) (interface{}, error) {
+		if r.Header["Authorization"] != nil {
+
+			tokenString := r.Header["Authorization"][0]
+			tokenString = strings.ReplaceAll(tokenString, "Bearer ", "")
+
+			token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 				_, ok := t.Method.(*jwt.SigningMethodHMAC)
 				if !ok {
 					SendUnAuthWrite(w)
@@ -32,6 +37,7 @@ func ValidateToken(next func(w http.ResponseWriter, r *http.Request)) http.Handl
 				next(w, r)
 			}
 		} else {
+			log.Default().Print("Header.Token is empty")
 			SendUnAuthWrite(w)
 		}
 	})
@@ -41,7 +47,7 @@ func SendUnAuthWrite(w http.ResponseWriter) {
 
 	SetContentJson(w)
 
-	log.Default().Print("unauthorized")
+	log.Default().Print("unauthorized trying")
 
 	w.WriteHeader(http.StatusUnauthorized)
 	m := make(map[string]string)
@@ -51,4 +57,13 @@ func SendUnAuthWrite(w http.ResponseWriter) {
 
 	_, err := w.Write(jsonM)
 	errors.CheckErr(err)
+}
+
+func NotPost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+
+		SendUnAuthWrite(w)
+
+		log.Panic("not post")
+	}
 }
