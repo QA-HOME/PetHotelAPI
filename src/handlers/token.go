@@ -14,6 +14,8 @@ var SECRET = []byte("super-secret-auth-key")
 
 func GetToken(w http.ResponseWriter, r *http.Request) {
 
+	NotPost(w, r)
+
 	SetContentJson(w)
 
 	if r.Header["X-Api-Key"] != nil {

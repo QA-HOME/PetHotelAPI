@@ -9,6 +9,8 @@ import (
 
 func Index(w http.ResponseWriter, r *http.Request) {
 
+	NotPost(w, r)
+
 	SetContentJson(w)
 
 	log.Default().Print("success")
