@@ -7,7 +7,6 @@ ENV GOOS=linux
 ENV GOARCH=arm64
 
 
-
 COPY . .
 
 RUN go build main.go
