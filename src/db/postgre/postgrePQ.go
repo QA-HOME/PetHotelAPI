@@ -6,20 +6,17 @@ import (
 	_ "github.com/lib/pq"
 	"log"
 	"v1/src/errors"
+	"v1/src/models/common"
+	"v1/src/models/db"
 )
 
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "postgres"
-	password = "postgres"
-	dbname   = "PetHotelAPI"
-)
+func Connect() (*sql2.DB, *sql2.DB) {
 
-func Connect() *sql2.DB {
+	data := db.GetPostgresData()
+
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+		data.Host, data.Port, data.User, data.Password, data.DBName)
 	DB, err := sql2.Open("postgres", psqlInfo)
 	errors.CheckErr(err)
 
@@ -29,7 +26,7 @@ func Connect() *sql2.DB {
 		log.Default().Print("DB connection is succesfull!")
 	}
 
-	return DB
+	return DB, nil
 }
 
 func Close(db *sql2.DB) {
@@ -38,4 +35,27 @@ func Close(db *sql2.DB) {
 	if err == nil {
 		log.Default().Print("DB Disconnected")
 	}
+}
+
+func InsertUser(user common.User) error {
+
+	PostgresDB, _ := Connect()
+	defer Close(PostgresDB)
+
+	log.Default().Print(user)
+
+	result, err := PostgresDB.
+		Exec("INSERT INTO Users(username, user_password, user_email, first_name, last_name, phone_number) VALUES($1, $2, $3, $4, $5, $6,)", user.Username, user.UserPassword, user.UserEmail, user.FirstName, user.LastName, user.PhoneNumber)
+
+	errors.CheckErr(err)
+
+	rowsAffected, _ := result.RowsAffected()
+	log.Default().Print("Effected (%d)", rowsAffected)
+
+	// ! LastInsertId is not supported by this driver
+	lastID, err2 := result.LastInsertId()
+	errors.CheckErr(err2)
+	fmt.Println("\nLAST ID", lastID, err2)
+
+	return err
 }

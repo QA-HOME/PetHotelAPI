@@ -60,10 +60,29 @@ func SendUnAuthWrite(w http.ResponseWriter) {
 }
 
 func NotPost(w http.ResponseWriter, r *http.Request) {
+
 	if r.Method != "POST" {
 
 		SendUnAuthWrite(w)
 
 		log.Panic("not post")
 	}
+
+}
+
+func EmptyParameters(w http.ResponseWriter, r *http.Request) {
+
+	SetContentJson(w)
+
+	log.Default().Print("Empty Parameters")
+
+	w.WriteHeader(http.StatusBadRequest)
+
+	m := make(map[string]string)
+	m["status"] = "bad request"
+	m["message"] = "some parameters is empty"
+	jsonM, _ := json.Marshal(m)
+
+	_, err := w.Write(jsonM)
+	errors.CheckErr(err)
 }

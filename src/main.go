@@ -10,6 +10,7 @@ import (
 func main() {
 	r := http.NewServeMux()
 	r.Handle("/", handlers.ValidateToken(handlers.Index))
+	r.Handle("/register", handlers.ValidateToken(handlers.Register))
 	r.HandleFunc("/token", handlers.GetToken)
 
 	log.Default().Print("Server localhost:8081 is started")
