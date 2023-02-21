@@ -45,12 +45,13 @@ func InsertUser(user common.User) error {
 	log.Default().Print(user)
 
 	result, err := PostgresDB.
-		Exec("INSERT INTO Users(username, user_password, user_email, first_name, last_name, phone_number) VALUES($1, $2, $3, $4, $5, $6,)", user.Username, user.UserPassword, user.UserEmail, user.FirstName, user.LastName, user.PhoneNumber)
+		Exec("INSERT INTO Users(username, user_password, user_email, first_name, last_name, phone_number) VALUES($1, $2, $3, $4, $5, $6)",
+			user.Username, user.UserPassword, user.UserEmail, user.FirstName, user.LastName, user.PhoneNumber)
 
 	errors.CheckErr(err)
 
 	rowsAffected, _ := result.RowsAffected()
-	log.Default().Print("Effected (%d)", rowsAffected)
+	log.Default().Printf("Effected (%d) rows", rowsAffected)
 
 	// ! LastInsertId is not supported by this driver
 	lastID, err2 := result.LastInsertId()
