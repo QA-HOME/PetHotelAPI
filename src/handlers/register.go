@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"v1/src/auth"
 	"v1/src/db/postgre"
 	"v1/src/errors"
 	"v1/src/models/common"
@@ -25,6 +26,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	if !user.CheckRegisterRequest() {
 		EmptyParameters(w, r)
 	} else {
+
+		user.UserPassword, err = auth.HashPassword(user.UserPassword)
+		errors.CheckErr(err)
+
 		err = postgre.InsertUser(user)
 		errors.CheckErr(err)
 
